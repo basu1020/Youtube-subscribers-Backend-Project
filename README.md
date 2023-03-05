@@ -137,4 +137,6 @@ Root directory has few folders and files which has our code logic.
 
 - The schema is defined using the Mongoose Schema constructor, and the resulting schema object is exported as a Mongoose model using the model method. The model method takes two arguments: the name of the model (in this case "Subscriber"), and the schema object that defines the model's fields and properties. This model can be used to perform CRUD operations on the database using Mongoose's methods.
 
+## Tests 
 
+Tests have been written in `__tests__` folder using `chai`, `chai-http` for HTTP request/response testing , `chai-as-promised` for extending chai's capabilities to handle asynchronous operations that return promises along with `mocha` . 
