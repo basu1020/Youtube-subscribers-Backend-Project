@@ -9,114 +9,37 @@ Root directory has few folders and files which has our code logic.
 - `src` - It is the main folder where server logic is written. 
 - `package.json` and `package-lock.json` - files with info about dependency used in this project. 
 
-## Structure and contents of **src** folder. 
+## API and Schema Details
 
-![YoutubeSRCoverview](https://user-images.githubusercontent.com/106004070/222953073-3be04fe6-5a1e-4bb4-b760-5be24f7b5eed.png)  
+### API Details
 
-`src` folder has three folders and `index.js` file 
-
-Folder structure - 
-- helper-files - It has two files `createDatabase.js` and `data.js`.
-  - `data.js` - It has subscribers details - names and subscribed channel
-  
-      ```javascript
-        const data = [
-        {
-          "name": "Jeread Krus",
-          "subscribedChannel": "CNET"
-        },
-        {
-          "name": "John Doe",
-          "subscribedChannel": "freeCodeCamp.org"
-        },
-        {
-          "name": "Lucifer",
-          "subscribedChannel": "Sentex"
-        }
-      ]
-
-      module.exports = data;
-     ```
-     
-  - `createDatabase` contains logic for creating database with the info in data.js file 
-  
-    ```javascript
-    const mongoose = require('mongoose')
-    const subscriberModel = require('../models/subscribers')
-    const data = require('./data')
-
-    // Connect to DATABASE
-    const DATABASE_URL = "mongodb://localhost:27017/subscribers";
-    mongoose.connect(DATABASE_URL,{ useNewUrlParser: true, useUnifiedTopology: true });
-    const db = mongoose.connection
-    db.on('error', (err) => console.log(err))
-    db.once('open', () => console.log('Database created...'))
-
-    const refreshAll = async () => {
-        await subscriberModel.deleteMany({})
-        // console.log(connection)
-        await subscriberModel.insertMany(data)
-        await mongoose.disconnect();
-    }
-    refreshAll()
-    ```
-    
-- models - This folder has `subscribers.js` which has logic for Subscribers schema. 
-
-    ```javascript
-    const mongoose = require('mongoose');
-
-    const susbcriberSchema = new mongoose.Schema({
-        name: {
-            type: String,
-            required: true,
-        },
-        subscribedChannel:{
-            type: String,
-            required: true,
-        },
-        subscribedDate: {
-            type: Date,
-            required: true,
-            default: Date.now
-        }
-    })
-
-    module.exports = mongoose.model('Subscriber',susbcriberSchema);
-    ```
-    
-- router-logic - It has `app.js` containing router logic 
+- This is a Node.js server using the Express framework to build a RESTful API for a YouTube subscribers.
+- The server defines three routes, which are accessed using HTTP GET requests.
+- The root route ('/') returns a JSON response containing information about the API and the available endpoints.
 
   ```javascript
-    const express = require('express');
-    const { check, validationResult } = require('express-validator');
-
-    // Create a new instance of the app
-    const app = express()
-
-    // Import Subscribers model
-    const Subscribers = require('../models/subscribers')
-
-    // Defining root route
     app.get('/', (req, res) => {
-        try {
-            res.status(200).json({
-                welcome: 'This is an API created for Youtube Subscribers Backend Project',
-                endpoints: {
-                    toGetAllSubsribers: '/subscribers',
-                    toGetAllSubsribersNames: '/subscribers/names',
-                    toGetSubscribersByID: '/subscribers/:id'
-                }
-            })
-        } catch (err) {
-            res.status(500).send({
-                error: err.message
-            })
-        }
-
-    })
-
-    // Defining route to get all subscribers
+      try {
+          res.status(200).json({
+              welcome: 'This is an API created for Youtube Subscribers Backend Project',
+              endpoints: {
+                  toGetAllSubsribers: '/subscribers',
+                  toGetAllSubsribersNames: '/subscribers/names',
+                  toGetSubscribersByID: '/subscribers/:id'
+              }
+          })
+      } catch (err) {
+          res.status(500).send({
+              error: err.message
+          })
+      }
+  })
+  ```
+  
+- The `/subscribers` route returns a JSON response containing an array of all the subscribers in the system.
+  
+  
+  ```javascript
     app.get('/subscribers', async (req, res) => {
         try {
             const subscribers = await Subscribers.find()
@@ -128,60 +51,90 @@ Folder structure -
                 error: err.message
             })
         }
-
     })
 
-    // Defining route to get subscribers by name and subscribed channel
-    app.get('/subscribers/names', async (req, res) => {
-        try {
-            const subscribers = await Subscribers.find({}, {
-                name: 1,
-                subscribedChannel: 1,
-                _id: 0
-            });
-            res.status(200).send({
-                subscribers: subscribers
-            });
-        } catch (err) {
-            res.status(500).send({
-                error: err.message
-            });
-        }
-    });
-
-    // Defining route to get subscriber by ID
-    // I have defined a middleware to check whether the given ID is a valid MongoDB hexadecimal or not. 
+  ```
+  
+- The `/subscribers/names` route returns a JSON response containing an array of subscribers' names and the channels they are subscribed to.
+  
+  
+  ```javascript
+  app.get('/subscribers/names', async (req, res) => {
+      try {
+          const subscribers = await Subscribers.find({}, {
+              name: 1,
+              subscribedChannel: 1,
+              _id: 0
+          });
+          res.status(200).send({
+              subscribers: subscribers
+          });
+      } catch (err) {
+          res.status(500).send({
+              error: err.message
+          });
+      }
+  });
+  ```
+  
+-  The '/subscribers/:id' route takes a parameter representing a subscriber's ID and returns a JSON response with the subscriber's details, including their name, email, and subscribed channels, provided the ID is a valid MongoDB hexadecimal ID. If the ID is invalid, the server returns an error message.
+ 
+    ```javascript
     app.get('/subscribers/:id', [
-        check('id').isLength({ min: 24, max: 24 }).isHexadecimal()
-    ],
-        async (req, res) => {
-            const errors = validationResult(req);
+      check('id').isLength({ min: 24, max: 24 }).isHexadecimal()
+      ],
+      async (req, res) => {
+          const errors = validationResult(req);
 
-            if (!errors.isEmpty()) {
-                return res.status(400).send({ message: 'Invalid subscriber ID.' });
-            }
+          if (!errors.isEmpty()) {
+              return res.status(400).send({ message: 'Invalid subscriber ID.' });
+          }
 
-            const id = req.params.id
-            try {
-                const subscriber = await Subscribers.findById(id).exec();
+          const id = req.params.id
+          try {
+              const subscriber = await Subscribers.findById(id).exec();
 
-                // findById(id) returns 'null' if ID was a valid hexadecimal but is not present in the collection, that's why if subscriber comes out to be null I am sending 'Subscriber not found.' message.
+              if (!subscriber) {
+                  return res.status(400).send({ message: 'Subscriber not found.' });
+              }
 
-                if (!subscriber) {
-                    return res.status(400).send({ message: 'Subscriber not found.' });
-                }
+              res.status(200).send(subscriber);
 
-                // sending subscriber if ID was found in collection. 
-                res.status(200).send(subscriber);
-
-            } catch (err) {
-                res.status(400).send({
-                    message: err.message
-                })
-            }
-        })
-
-    // Export app
-    module.exports = app;
+          } catch (err) {
+              res.status(400).send({
+                  message: err.message
+              })
+          }
+      })
 
     ```
+
+### Schema Details
+
+  ```javascript
+  const mongoose = require('mongoose');
+
+  const susbcriberSchema = new mongoose.Schema({
+      name: {
+          type: String,
+          required: true,
+      },
+      subscribedChannel:{
+          type: String,
+          required: true,
+      },
+      subscribedDate: {
+          type: Date,
+          required: true,
+          default: Date.now
+      }
+  })
+
+  module.exports = mongoose.model('Subscriber',susbcriberSchema);
+  ```
+
+- This code defines a Mongoose schema for a "Subscriber" model. The schema has three fields: name, subscribedChannel, and subscribedDate. The name and subscribedChannel fields are of type String and are required, meaning that they must be provided when creating a new subscriber. The subscribedDate field is of type Date, also required, and has a default value of the current date and time.
+
+- The schema is defined using the Mongoose Schema constructor, and the resulting schema object is exported as a Mongoose model using the model method. The model method takes two arguments: the name of the model (in this case "Subscriber"), and the schema object that defines the model's fields and properties. This model can be used to perform CRUD operations on the database using Mongoose's methods.
+
+
