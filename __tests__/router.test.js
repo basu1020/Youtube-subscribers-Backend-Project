@@ -112,12 +112,21 @@ describe('testing server', () => {
             chai.expect(res.body.subscribedChannel).to.equal('freeCodeCamp.org')
         })
 
-        // Testing for status 400 and error message if id can't be found
-        it("Should return status 400 and error message if id not found", async () => {
+        // Testing for status 400 and 'Invalid subscriber ID.' error message if id is not a valid hexadecimal
+        it("Should return status 400 and 'Invalid subscriber ID.' error message if id is not a valid hexadecimal", async () => {
+            
             const res = await chai.request(app).get(`/subscribers/123456`)
 
             chai.expect(res.status).to.equal(400)
-            chai.expect(res.body.message).to.equal('Subscriber not found for id 123456')
+            chai.expect(res.body.message).to.equal('Invalid subscriber ID.')
+        })
+
+        it("Should return status 400 and 'Subscriber not found.' if id was a valid hexadecimal but not present in the collection", async() => {
+
+            const res = await chai.request(app).get(`/subscribers/640173ad319c53709bfa65a7`)
+
+            chai.expect(res.status).to.equal(400)
+            chai.expect(res.body.message).to.equal('Subscriber not found.')
         })
     })
 
