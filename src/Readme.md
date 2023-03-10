@@ -1,8 +1,8 @@
-# Structure and contents of **src** folder. 
+# Structure and contents of **src** directory. 
 
 ![YoutubeSRCoverview](https://user-images.githubusercontent.com/106004070/222953073-3be04fe6-5a1e-4bb4-b760-5be24f7b5eed.png)  
 
-`src` folder has three folders and `index.js` file 
+`src` directory has three folders and `index.js` file 
 
 Folder structure - 
 - helper-files - It has two files `createDatabase.js` and `data.js`.
