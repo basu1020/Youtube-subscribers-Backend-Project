@@ -2,19 +2,24 @@
 Hello All, this is Youtube Subscribers Backend project where I have created an API using `Express.js` and `MongoDB`. 
 It has three endpoints which gives info about the subscribers and their subscribed channel. 
 
+![YoutubeSample](https://user-images.githubusercontent.com/106004070/224384848-8359bf07-d02c-4e60-a2f3-93b25717038e.png)
+
+link - https://smiling-dirndl-yak.cyclic.app/
+
+
 ## Overview of the root directory 
 Root directory has few folders and files which has our code logic. 
 - `__tests__` - it has two test files `router.test.js` and `schema.test.js` testing the server and schema created with the help of `mongoose`. 
 - `mochawesome-report` - It has mochawesome reports created while testing. 
 - `src` - It is the main folder where server logic is written. 
-- `package.json` and `package-lock.json` - files with info about dependency used in this project. 
+- `package.json` and `package-lock.json` - files with info about dependencies used in this project. 
 
 ## API and Schema Details
 
 ### API Details
 
 - This is a Node.js server using the Express framework to build a RESTful API for a YouTube subscribers.
-- The server defines three routes, which are accessed using HTTP GET requests.
+- The API has three routes, which are accessed using HTTP GET requests.
 - The root route ('/') returns a JSON response containing information about the API and the available endpoints.
 
   ```javascript
@@ -133,9 +138,9 @@ Root directory has few folders and files which has our code logic.
   module.exports = mongoose.model('Subscriber',susbcriberSchema);
   ```
 
-- This code defines a Mongoose schema for a "Subscriber" model. The schema has three fields: name, subscribedChannel, and subscribedDate. The name and subscribedChannel fields are of type String and are required, meaning that they must be provided when creating a new subscriber. The subscribedDate field is of type Date, also required, and has a default value of the current date and time.
+- It is a Mongoose schema for a "Subscriber" model. The schema has three fields: name, subscribedChannel, and subscribedDate. The name and subscribedChannel fields are of type String and are required, meaning that they must be provided when creating a new subscriber. The subscribedDate field is of type Date, also required, and has a default value of the current date and time.
 
-- The schema is defined using the Mongoose Schema constructor, and the resulting schema object is exported as a Mongoose model using the model method. The model method takes two arguments: the name of the model (in this case "Subscriber"), and the schema object that defines the model's fields and properties. This model can be used to perform CRUD operations on the database using Mongoose's methods.
+- The schema is defined using the Mongoose Schema constructor, and the resulting schema object is exported as a Mongoose model using the `mongoose.model()` method. The model method takes two arguments: the name of the model (in this case "Subscriber"), and the schema object that defines the model's fields and properties.
 
 ## Tests 
 
